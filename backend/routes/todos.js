@@ -13,7 +13,7 @@ router.route("/").get(getAllTodos).post(createTodo);
 router
   .route("/:id")
   .get(getTodoById)
-  .put(updateTodoById)
+  .patch(updateTodoById)
   .delete(deleteTodoById);
 
 module.exports = router;

@@ -3,13 +3,13 @@ const path = require("path");
 const fsPromise = require("fs").promises;
 const { v4: uuidv4 } = require("uuid");
 
-function validateTodo(task) {
-  if (!task || typeof task !== "string") {
-    return { valid: false, message: "task is required and must be a string" };
-  }
+// function validateTodo(task) {
+//   if (!task || typeof task !== "string") {
+//     return { valid: false, message: "task is required and must be a string" };
+//   }
 
-  return { valid: true };
-}
+//   return { valid: true };
+// }
 
 async function getAllTodos(req, res) {
   try {
@@ -44,12 +44,13 @@ async function createTodo(req, res) {
       return res.status(400).json({ error: "Request body is missing" });
     }
 
-    const validation = validateTodo(body);
-    if (!validation.valid) {
-      return res.status(400).json({ error: validation.message });
+    if (!body.task || typeof body.task !== "string") {
+      return res
+        .status(400)
+        .json({ error: "task is required and must be a string" });
     }
 
-    const newTodo = { id: uuidv4(), done: false, ...body };
+    const newTodo = { id: uuidv4(), done: false, task: body.task };
     const updatedTodos = [...todoDatabase.todos, newTodo];
 
     await fsPromise.writeFile(
@@ -69,24 +70,38 @@ async function updateTodoById(req, res) {
   try {
     const { id } = req.params;
     const body = req.body;
+    console.log("body", body);
 
     //body not found
-    if (!body || body == {}) {
+    if (!body || Object.keys(body).length === 0) {
       return res.status(400).send("Request body is missing");
-    }
-
-    const validation = validateTodo(body);
-    if (!validation.valid) {
-      return res.status(400).json({ error: validation.message });
     }
 
     const todo = todoDatabase.todos.find((todo) => todo.id === id);
     if (!todo) {
       return res.status(404).send("Todo not found");
     }
-    const updatedTodo = { ...todo, ...body };
-    const updatedTodos = todoDatabase.todos.map((todo) =>
-      todo.id === id ? updatedTodo : todo
+
+    //validation for task
+    if (body.task !== undefined) {
+      if (typeof body.task !== "string" || body.task.trim() === "") {
+        return res
+          .status(400)
+          .json({ error: "task must be a non-empty string" });
+      }
+      todo.task = body.task;
+    }
+
+    //validation for done
+    if (body.done !== undefined) {
+      if (typeof body.done !== "boolean") {
+        return res.status(400).json({ error: "done must be a boolean" });
+      }
+      todo.done = body.done;
+    }
+
+    const updatedTodos = todoDatabase.todos.map((eachTodo) =>
+      todo.id === id ? todo : eachTodo
     );
     todoDatabase.setTodos(updatedTodos);
 
