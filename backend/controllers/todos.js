@@ -1,15 +1,7 @@
-const { todoDatabase } = require("../utils");
+const { todoDatabase } = require("../utils/utils");
 const path = require("path");
 const fsPromise = require("fs").promises;
 const { v4: uuidv4 } = require("uuid");
-
-// function validateTodo(task) {
-//   if (!task || typeof task !== "string") {
-//     return { valid: false, message: "task is required and must be a string" };
-//   }
-
-//   return { valid: true };
-// }
 
 async function getAllTodos(req, res) {
   try {
@@ -38,19 +30,21 @@ async function getTodoById(req, res) {
 
 async function createTodo(req, res) {
   try {
-    const body = req.body;
+    const {
+      title,
+      description = null,
+      dueDate = null,
+      priority = "low",
+    } = req.body;
 
-    if (!body || Object.keys(body).length === 0) {
-      return res.status(400).json({ error: "Request body is missing" });
-    }
-
-    if (!body.task || typeof body.task !== "string") {
-      return res
-        .status(400)
-        .json({ error: "task is required and must be a string" });
-    }
-
-    const newTodo = { id: uuidv4(), done: false, task: body.task };
+    const newTodo = {
+      id: uuidv4(),
+      title: title,
+      description: description,
+      dueDate: dueDate,
+      priority: priority,
+      completed: false,
+    };
     const updatedTodos = [...todoDatabase.todos, newTodo];
 
     await fsPromise.writeFile(
@@ -62,43 +56,24 @@ async function createTodo(req, res) {
   } catch (error) {
     return res.status(500).json({ error: "Failed to create todo" });
   }
-
-  //updating todos in json file
 }
 
 async function updateTodoById(req, res) {
   try {
     const { id } = req.params;
-    const body = req.body;
-    console.log("body", body);
-
-    //body not found
-    if (!body || Object.keys(body).length === 0) {
-      return res.status(400).send("Request body is missing");
-    }
+    const { title, description, dueDate, priority, completed } = req.body;
 
     const todo = todoDatabase.todos.find((todo) => todo.id === id);
     if (!todo) {
       return res.status(404).send("Todo not found");
     }
 
-    //validation for task
-    if (body.task !== undefined) {
-      if (typeof body.task !== "string" || body.task.trim() === "") {
-        return res
-          .status(400)
-          .json({ error: "task must be a non-empty string" });
-      }
-      todo.task = body.task;
-    }
-
-    //validation for done
-    if (body.done !== undefined) {
-      if (typeof body.done !== "boolean") {
-        return res.status(400).json({ error: "done must be a boolean" });
-      }
-      todo.done = body.done;
-    }
+    // Update only the fields provided in the request body
+    if (title !== undefined) todo.title = title;
+    if (description !== undefined) todo.description = description;
+    if (dueDate !== undefined) todo.dueDate = dueDate;
+    if (priority !== undefined) todo.priority = priority;
+    if (completed !== undefined) todo.completed = completed;
 
     const updatedTodos = todoDatabase.todos.map((eachTodo) =>
       todo.id === id ? todo : eachTodo
