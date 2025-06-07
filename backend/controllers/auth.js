@@ -1,8 +1,6 @@
 const jwt = require("jsonwebtoken");
 const bcrypt = require("bcryptjs");
-const { userDatabase } = require("../utils/utils");
-const path = require("path");
-const fsPromise = require("fs").promises;
+const User = require("../model/User");
 
 const createAccessToken = (userId, username) => {
   return jwt.sign(
@@ -31,10 +29,10 @@ const validatePassword = async (plainPassword, hashedPassword) => {
 };
 const handleLogin = async (req, res) => {
   const { username, password } = req.body;
+  console.log("handle login username andm password", username, password);
   try {
-    const foundUser = userDatabase.users.find(
-      (eachUser) => eachUser.username === username
-    );
+    const foundUser = await User.findOne({ username: username });
+    console.log("found user is ", foundUser);
 
     //If not user is found
     if (!foundUser) {
@@ -49,15 +47,8 @@ const handleLogin = async (req, res) => {
 
       //saving refresh token with current user
       foundUser.refreshToken = refreshToken;
-      const newUsers = userDatabase.users.map((eachUser) =>
-        eachUser.username === username ? foundUser : eachUser
-      );
-      userDatabase.setUsers(newUsers);
 
-      await fsPromise.writeFile(
-        path.join(__dirname, "..", "model", "user.json"),
-        JSON.stringify(newUsers)
-      );
+      await foundUser.save();
 
       // Creates Secure Cookie with refresh token
       res.cookie("jwt", refreshToken, {

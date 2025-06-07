@@ -1,11 +1,10 @@
-const { todoDatabase } = require("../utils/utils");
-const path = require("path");
-const fsPromise = require("fs").promises;
-const { v4: uuidv4 } = require("uuid");
+const Todos = require("../model/Todos");
 
 async function getAllTodos(req, res) {
   try {
-    const data = todoDatabase.todos;
+    const userId = req.user.id;
+    console.log("User id is ", userId);
+    const data = await Todos.find({ userId });
     res.status(200).send(data);
   } catch (err) {
     res.status(500).send("Error retriving todos form server");
@@ -15,8 +14,8 @@ async function getAllTodos(req, res) {
 async function getTodoById(req, res) {
   try {
     const { id } = req.params;
-    const todo = todoDatabase.todos.find((todo) => todo.id === id);
-
+    console.log("Id value is ", id);
+    const todo = await Todos.findById(id);
     if (!todo) {
       return res.status(404).json({ error: "Todo not found" });
     }
@@ -37,20 +36,14 @@ async function createTodo(req, res) {
       priority = "low",
     } = req.body;
 
-    const newTodo = {
-      id: uuidv4(),
+    await Todos.create({
       title: title,
       description: description,
       dueDate: dueDate,
       priority: priority,
       completed: false,
-    };
-    const updatedTodos = [...todoDatabase.todos, newTodo];
-
-    await fsPromise.writeFile(
-      path.join(__dirname, "..", "model", "data.json"),
-      JSON.stringify(updatedTodos, null, 2)
-    );
+      userId: req.user.id,
+    });
 
     res.status(201).json({ message: "Todo created successfully" });
   } catch (error) {
@@ -63,7 +56,7 @@ async function updateTodoById(req, res) {
     const { id } = req.params;
     const { title, description, dueDate, priority, completed } = req.body;
 
-    const todo = todoDatabase.todos.find((todo) => todo.id === id);
+    const todo = await Todos.findById(id);
     if (!todo) {
       return res.status(404).send("Todo not found");
     }
@@ -75,18 +68,9 @@ async function updateTodoById(req, res) {
     if (priority !== undefined) todo.priority = priority;
     if (completed !== undefined) todo.completed = completed;
 
-    const updatedTodos = todoDatabase.todos.map((eachTodo) =>
-      todo.id === id ? todo : eachTodo
-    );
-    todoDatabase.setTodos(updatedTodos);
+    await Todos.findByIdAndUpdate(id, todo);
 
-    //updating todos in json file
-    await fsPromise.writeFile(
-      path.join(__dirname, "..", "model", "data.json"),
-      JSON.stringify(updatedTodos, null, 2)
-    );
-
-    res.status(200).json({ message: "Todo updated successfully" });
+    res.status(200).json({ message: `Todo updated successfully with value ` });
   } catch (error) {
     return res.status(500).json({ error: "Failed to update todo" });
   }
@@ -95,17 +79,11 @@ async function updateTodoById(req, res) {
 async function deleteTodoById(req, res) {
   try {
     const { id } = req.params;
-    const todo = todoDatabase.todos.find((todo) => todo.id === id);
+    const todo = await Todos.findById(id);
     if (!todo) {
       return res.status(404).send("Todo not found");
     }
-    const todos = todoDatabase.todos.filter((todo) => todo.id !== id);
-
-    //updating todos in json file
-    await fsPromise.writeFile(
-      path.join(__dirname, "..", "model", "data.json"),
-      JSON.stringify(todos, null, 2)
-    );
+    await Todos.findByIdAndDelete(id);
     res.status(200).json({ message: "Todo deleted successfully" });
   } catch (error) {
     return res.status(500).json({ error: "Failed to delete todo" });

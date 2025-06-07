@@ -41,15 +41,15 @@ router
   .route("/:id")
   .get(
     param("id")
-      .isUUID()
-      .withMessage("Invalid ID format. ID must be a valid UUID"),
+      .isMongoId()
+      .withMessage("Invalid ID format. ID must be a valid MongoDB ObjectId"),
     validate,
     getTodoById
   )
   .patch(
     param("id")
-      .isUUID()
-      .withMessage("Invalid ID format. ID must be a valid UUID"),
+      .isMongoId()
+      .withMessage("Invalid ID format. ID must be a valid MongoDB ObjectId"),
     body("title")
       .optional()
       .trim()
@@ -77,8 +77,8 @@ router
   )
   .delete(
     param("id")
-      .isUUID()
-      .withMessage("Invalid ID format. ID must be a valid UUID"),
+      .isMongoId()
+      .withMessage("Invalid ID format. ID must be a valid MongoDB ObjectId"),
     validate,
     deleteTodoById
   );
