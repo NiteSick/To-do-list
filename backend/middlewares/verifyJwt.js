@@ -9,7 +9,6 @@ const verifyJWT = (req, res, next) => {
   jwt.verify(token, process.env.JWT_ACCESS_TOKEN, (err, decoded) => {
     if (err) return res.status(403).json({ message: "invalid token" }); //invalid token
 
-    console.log("decoded value is ", decoded);
     req.user = {
       username: decoded.UserInfo?.username,
       id: decoded.UserInfo?.userId,

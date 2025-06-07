@@ -7,7 +7,7 @@ async function getAllTodos(req, res) {
     const data = await Todos.find({ userId });
     res.status(200).send(data);
   } catch (err) {
-    res.status(500).send("Error retriving todos form server");
+    res.status(500).send("Error retriving todos form server ", err);
   }
 }
 
@@ -21,9 +21,8 @@ async function getTodoById(req, res) {
     }
 
     return res.status(200).json(todo);
-  } catch (error) {
-    console.error("Error getting todo:", error);
-    return res.status(500).json({ error: "Failed to retrieve todo" });
+  } catch (err) {
+    return res.status(500).json({ error: err });
   }
 }
 
@@ -46,8 +45,8 @@ async function createTodo(req, res) {
     });
 
     res.status(201).json({ message: "Todo created successfully" });
-  } catch (error) {
-    return res.status(500).json({ error: "Failed to create todo" });
+  } catch (err) {
+    return res.status(500).json({ error: err });
   }
 }
 
@@ -71,8 +70,8 @@ async function updateTodoById(req, res) {
     await Todos.findByIdAndUpdate(id, todo);
 
     res.status(200).json({ message: `Todo updated successfully with value ` });
-  } catch (error) {
-    return res.status(500).json({ error: "Failed to update todo" });
+  } catch (err) {
+    return res.status(500).json({ error: err });
   }
 }
 
@@ -85,8 +84,8 @@ async function deleteTodoById(req, res) {
     }
     await Todos.findByIdAndDelete(id);
     res.status(200).json({ message: "Todo deleted successfully" });
-  } catch (error) {
-    return res.status(500).json({ error: "Failed to delete todo" });
+  } catch (err) {
+    return res.status(500).json({ error: err });
   }
 }
 

@@ -1,8 +1,4 @@
-const { userDatabase } = require("../utils/utils");
-const { v4: uuidv4 } = require("uuid");
-const fsPromise = require("fs").promises;
 const bcrypt = require("bcryptjs");
-const path = require("path");
 const User = require("../model/User");
 
 const createNewUser = async (req, res) => {

@@ -16,11 +16,12 @@ const createAccessToken = (userId, username) => {
 };
 
 const createRefreshToken = (username) => {
-  return (refreshToken = jwt.sign(
+  const refreshToken = jwt.sign(
     { username: username },
     process.env.JWT_REFRESH_TOKEN,
     { expiresIn: process.env.JWT_REFRESH_TOKEN_EXPIRES_IN }
-  ));
+  );
+  return refreshToken;
 };
 
 const validatePassword = async (plainPassword, hashedPassword) => {
