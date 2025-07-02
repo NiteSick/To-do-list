@@ -1,0 +1,27 @@
+:root {
+  --primary-color: #00809d;
+  --secondary-color: #fcecdd;
+  --tertiary-color: #ff7601;
+  --extra-color: #f3a26d;
+
+  --white: #ffffff;
+  --black: #000000;
+  --light-100: #d64343;
+  --light-200: #cbcbcb;
+  --dark-100: #a6a6a6;
+  --dark-200: #818181;
+
+  --primary-button-hover: #034e5f;
+  --secondary-button-hover: #f3a26d;
+}
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+body {
+  background-color: gray;
+}
+input:focus {
+  outline: none;
+}

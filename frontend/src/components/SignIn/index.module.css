@@ -1,0 +1,53 @@
+.loginPanel {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+  padding: 16px;
+  border-radius: 8px;
+  background-color: var(--secondary-color);
+  width: fit-content;
+  margin: 100px auto;
+  min-width: 400px;
+}
+
+.heading {
+  margin-bottom: 16px;
+  font-size: 20px;
+}
+.form {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+  gap: 10px;
+  width: 100%;
+}
+.inputContainer {
+  width: 100%;
+}
+
+.visibleIconBtn {
+  padding: 6px;
+  border-radius: 8px;
+  cursor: pointer;
+  border: none;
+  background-color: transparent;
+}
+
+.loginBtn {
+  width: 100%;
+  border: none;
+  padding: 8px 16px;
+  background-color: var(--primary-color);
+  border-radius: 16px;
+  cursor: pointer;
+  color: var(--white);
+}
+.eyeIcon {
+  width: 20px;
+}
+.signUpRedirection {
+  margin-top: 10px;
+  text-align: right;
+}
