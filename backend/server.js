@@ -9,11 +9,18 @@ const logoutRouter = require("./routes/logout");
 const userRouter = require("./routes/users");
 const verifyJWT = require("./middlewares/verifyJwt");
 const connectDB = require("./config/connnectDb");
+const credentials = require("./middlewares/credentials");
+const cors = require("cors");
+const corsOptions = require("./config/corsOptions");
 
 const app = express();
 
 // connnect to database
 connectDB();
+
+app.use(credentials);
+
+app.use(cors(corsOptions));
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));

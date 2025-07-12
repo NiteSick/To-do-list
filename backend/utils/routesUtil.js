@@ -1,22 +1,17 @@
 const { validationResult } = require("express-validator");
 
-const formatValidateError = (res, errors) => {
-  const error = new Error("Unexpected input value");
-  error.errorCode = "HD-0422";
-  error.status = 422;
-  error.meta = { errors: errors.mapped() };
-  error.name = "ValidationError";
-  return res.json({ error });
-};
-
 const validate = (req, res, next) => {
-  const errors = validationResult(req).formatWith(({ msg }) => msg);
-
-  if (errors.isEmpty()) {
-    next();
-  } else {
-    throw formatValidateError(res, errors);
+  console.log("req body ", req);
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    // Return a clear error response
+    return res.status(422).json({
+      errorCode: "HD-0422",
+      message: "Unexpected input value",
+      errors: errors.mapped(),
+    });
   }
+  next();
 };
 
 module.exports = {

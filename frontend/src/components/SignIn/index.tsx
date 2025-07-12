@@ -6,17 +6,19 @@ import Button from "../common/Button";
 import TextInput from "../common/TextInput";
 import { Link } from "react-router-dom";
 import { validateWithRegex } from "../../utils";
-import axios from "axios";
+import ApiService from "../../Service/Axios";
 
 const SignIn = () => {
   const [formData, setFormData] = useState({
     username: "",
+    email: "",
     password: "",
     passwordCheck: "",
   });
 
   const [errors, setErrors] = useState({
     usernameError: "",
+    emailError: "",
     pwdError: "",
     pwdCheckError: "",
   });
@@ -37,17 +39,26 @@ const SignIn = () => {
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    const url = "http://localhost:3500/api/register";
-    const postData = {
+
+    const body = {
       username: formData.username,
+      email: formData.email,
       password: formData.password,
     };
 
     try {
-      const response = await axios.post(url, postData);
-      console.log("response is ", response);
+      const response = await ApiService.post(
+        "http://localhost:3500/api/register",
+
+        {
+          data: body,
+          headers: { "Content-Type": "application/json" },
+        }
+      );
+
+      console.log("response", response);
     } catch (error) {
-      console.error("Async/Await Error:", error);
+      console.log("error :", error);
     }
   };
 
@@ -64,9 +75,27 @@ const SignIn = () => {
     const errorMsg = validateWithRegex(
       value,
       usernamePattern,
-      "Password must be 8–20 characters with no spaces"
+      "Username must be 8–20 characters with no spaces"
     );
     setErrors((prev) => ({ ...prev, usernameError: errorMsg }));
+  };
+
+  const handleOnEmailChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value;
+    setFormData((prev) => ({ ...prev, email: value }));
+
+    if (!value.trim()) {
+      setErrors((prev) => ({ ...prev, emailError: "Email is required" }));
+      return;
+    }
+
+    const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    const errorMsg = validateWithRegex(
+      value,
+      emailPattern,
+      "Must be a valid email"
+    );
+    setErrors((prev) => ({ ...prev, emailError: errorMsg }));
   };
 
   const handleOnPasswordChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -132,6 +161,18 @@ const SignIn = () => {
         </div>
         <div className={styles.inputContainer}>
           <TextInput
+            inputLabel="Email"
+            placeholder="Enter your Email"
+            required={true}
+            type="email"
+            value={formData.email}
+            error={errors.emailError}
+            onChange={handleOnEmailChange}
+            id="email-sign-in-input"
+          ></TextInput>
+        </div>
+        <div className={styles.inputContainer}>
+          <TextInput
             id="password-sign-in-input"
             inputLabel="Password"
             placeholder="Enter your password"
@@ -173,7 +214,7 @@ const SignIn = () => {
             required={true}
             value={formData.passwordCheck}
             error={errors.pwdCheckError}
-            type={isPasswordVisible ? "text" : "password"}
+            type={"password"}
             onChange={handlePasswordRecheck}
             id="password-check-sign-in-input"
           ></TextInput>
@@ -189,7 +230,7 @@ const SignIn = () => {
         </Button>
       </form>
       <Link className={styles.signUpRedirection} to="login">
-        {"Login to your account"}
+        {"Already have a account. Login"}
       </Link>
     </div>
   );

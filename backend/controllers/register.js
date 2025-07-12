@@ -3,13 +3,17 @@ const User = require("../model/User");
 
 const createNewUser = async (req, res) => {
   try {
-    const { username, password } = req.body;
+    const { username, email, password } = req.body;
 
     // Check if the user already exists in the database
     const existingUser = await User.findOne({ username: username });
-    console.log("existing user is", existingUser);
     if (existingUser) {
       return res.status(409).json({ message: "User already exists" });
+    }
+
+    const existingEmail = await User.findOne({ email: email });
+    if (existingEmail) {
+      return res.status(409).json({ message: "Email already exists" });
     }
 
     // Hash the password
@@ -18,6 +22,7 @@ const createNewUser = async (req, res) => {
     //create a new user
     await User.create({
       username: username,
+      email: email,
       password: hashedPassword,
     });
 

@@ -14,6 +14,14 @@ router.route("/").post(
     .withMessage("Username cannot be empty string")
     .isLength({ max: 20, min: 8 })
     .withMessage("username should be between 8 to 20 character"),
+  body("email")
+    .trim()
+    .isString()
+    .withMessage("Email should be a string")
+    .notEmpty()
+    .withMessage("Email cannot be empty string")
+    .isEmail()
+    .withMessage("String should be a valid email"),
   body("password")
     .trim()
     .isString()
