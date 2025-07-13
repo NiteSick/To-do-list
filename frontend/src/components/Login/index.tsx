@@ -4,10 +4,15 @@ import visibleIcon from "../../asset/visible.svg";
 import notVisibleIcon from "../../asset/not-visible.svg";
 import Button from "../common/Button";
 import TextInput from "../common/TextInput";
-import { Link } from "react-router-dom";
+import { Link, useHistory } from "react-router-dom";
 import { validateWithRegex } from "../../utils";
+import ApiService from "../../service/Axios";
+import useAuth from "../../hooks/useAuth";
 
 const Login = () => {
+  const { setAuth } = useAuth();
+  const history = useHistory();
+
   const [formData, setFormData] = useState({
     username: "",
     password: "",
@@ -21,9 +26,28 @@ const Login = () => {
     pwdError: "",
   });
 
-  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    console.log("handle submit is call3d");
+
+    const body = {
+      username: formData.username,
+      password: formData.password,
+    };
+
+    try {
+      const response = await ApiService.post(`/auth`, body, {
+        headers: { "Content-Type": "application/json" },
+        withCredentials: true,
+      });
+      setAuth({
+        accessToken: response?.data?.accessToken,
+        user: response?.data?.user?.username,
+      });
+
+      history.push("/users");
+    } catch (error) {
+      console.log("error: ", error);
+    }
   };
 
   useEffect(() => {

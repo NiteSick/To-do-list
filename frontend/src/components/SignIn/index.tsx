@@ -6,7 +6,7 @@ import Button from "../common/Button";
 import TextInput from "../common/TextInput";
 import { Link } from "react-router-dom";
 import { validateWithRegex } from "../../utils";
-import ApiService from "../../Service/Axios";
+import ApiService from "../../service/Axios";
 
 const SignIn = () => {
   const [formData, setFormData] = useState({
@@ -47,14 +47,9 @@ const SignIn = () => {
     };
 
     try {
-      const response = await ApiService.post(
-        "http://localhost:3500/api/register",
-
-        {
-          data: body,
-          headers: { "Content-Type": "application/json" },
-        }
-      );
+      const response = await ApiService.post(`/register`, body, {
+        headers: { "Content-Type": "application/json" },
+      });
 
       console.log("response", response);
     } catch (error) {

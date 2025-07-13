@@ -1,15 +1,15 @@
-const { userDatabase } = require("../utils/utils");
 const jwt = require("jsonwebtoken");
+const User = require("../model/User");
 
 const handleRefresh = async (req, res) => {
   const cookies = req.cookies;
+  console.log("handle refresh ", req);
   console.log("cookie is ", cookies);
-  if (!cookies?.jwt) return res.sendStatus(401);
+  if (!cookies?.jwt)
+    return res.status(401).json({ error: "jwt cookie not found" });
 
   const refreshToken = cookies.jwt;
-  const foundUser = userDatabase.users.find(
-    (eachUser) => eachUser.refreshToken === refreshToken
-  );
+  const foundUser = await User.findOne({ refreshToken });
 
   console.log("cookie is ", foundUser);
   if (!foundUser) {
